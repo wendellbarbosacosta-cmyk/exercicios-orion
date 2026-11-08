@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  # 1. SERVIÇO DE BANCO DE DADOS
+  db:
+    image: postgres:15-alpine
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - orion_db_data_extra:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    # O Healthcheck fica "pingando" o banco até ele responder que está pronto
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10          
+      start_period: 30s
+
+  # 2. SERVIÇO DO PGADMIN (Interface Gráfica)
+  pgadmin:
+    image: dpage/pgadmin4
+    env_file:
+      - .env
+    # Mapeia a porta 5050 do PC para a porta 80 do container do pgAdmin
+    ports:
+      - "5050:80"
+    # Só liga o pgAdmin depois que o healthcheck do banco der "verde"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # 3. SERVIÇO DA API
+  api:
+    build: ./api
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    # A API só tenta ligar depois que o banco estiver 100% pronto
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  orion_db_data_extra:
