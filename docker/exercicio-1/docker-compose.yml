@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  app-hello:
+    # Diz ao Compose para construir a imagem usando o Dockerfile que está nesta mesma pasta (.)
+    build: .
+    
+    # Expõe a porta 3000 do computador para a porta 3000 de dentro do container
+    ports:
+      - "3000:3000"
+    
+    # Montando a pasta atual (.) para dentro da pasta (/app) no container.
+    volumes:
+      - .:/app
