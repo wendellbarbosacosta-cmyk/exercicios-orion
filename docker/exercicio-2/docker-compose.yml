@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  # 1. SERVIÇO DE BANCO DE DADOS
+  db:
+    image: postgres:15-alpine
+    # Lê as senhas do nosso arquivo .env
+    env_file:
+      - .env 
+    # Estamos puxando os valores do nosso .env dinamicamente.
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+      POSTGRES_DB: ${DB_NAME}
+    # Cria um volume nomeado para manter os dados salvos mesmo se o container for apagado
+    volumes:
+      - orion_db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  # 2. SERVIÇO DA NOSSA API (PYTHON)
+  api:
+    # Diz ao Compose que o Dockerfile da API está dentro da subpasta "api"
+    build: ./api
+    ports:
+      - "3000:3000"
+    # A API também precisa ler o .env para saber a senha na hora de conectar
+    env_file:
+      - .env
+    # Monta a pasta local para refletir alterações de código em tempo real
+    volumes:
+      - ./api:/app
+    # Garante que a API só tente ligar depois que o Banco de Dados já estiver no ar
+    depends_on:
+      - db
+
+# Declaração do volume nomeado que foi usado no serviço 'db'
+volumes:
+  orion_db_data:
