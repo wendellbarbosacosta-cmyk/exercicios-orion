@@ -1,0 +1,5 @@
+.git
+.gitignore
+prints_sql/
+prints_nosql/
+*.md
