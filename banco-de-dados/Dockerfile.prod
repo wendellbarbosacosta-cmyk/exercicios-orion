@@ -1,0 +1,4 @@
+FROM postgres:16-alpine
+# Imagem otimizada para Produção (removendo pacotes residuais para deixar mais leve)
+ENV POSTGRES_DB=orion_db
+RUN apk del tzdata && rm -rf /var/cache/apk/*

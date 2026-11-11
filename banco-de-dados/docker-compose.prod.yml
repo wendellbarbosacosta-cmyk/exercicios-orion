@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  db_postgres:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    container_name: orion_postgres_prod
+    environment:
+      POSTGRES_USER: orion_user
+      POSTGRES_PASSWORD: orion_password
+    networks:
+      - orion_network_prod
+
+  db_mongo:
+    image: mongo:latest
+    container_name: orion_mongo_prod
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: orion_admin
+      MONGO_INITDB_ROOT_PASSWORD: orion_admin_pass
+    networks:
+      - orion_network_prod
+
+networks:
+  orion_network_prod:
+    driver: bridge
