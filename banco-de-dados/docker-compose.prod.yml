@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  db_postgres:
+    image: postgres:16-alpine
+    container_name: orion_postgres_prod
+    environment:
+      POSTGRES_USER: orion_user
+      POSTGRES_PASSWORD: orion_password
+      POSTGRES_DB: orion_db
+    # Portas não expostas para o host por segurança
+    # Sem volumes montados conforme exigência do PDF
+    networks:
+      - orion_network_prod
+
+  db_mongo:
+    image: mongo:latest
+    container_name: orion_mongo_prod
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: orion_admin
+      MONGO_INITDB_ROOT_PASSWORD: orion_admin_pass
+    # Portas não expostas para o host por segurança
+    # Sem volumes montados conforme exigência do PDF
+    networks:
+      - orion_network_prod
+
+networks:
+  orion_network_prod:
+    driver: bridge
